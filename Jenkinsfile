@@ -29,7 +29,7 @@ pipeline{
                 script {
                     buildImage 'monirerahmani/tech-app:jma-3.0'
                     dockerLogin()
-                    dockerPush 'monirerahmani/tech-app:jma-3.0
+                    dockerPush 'monirerahmani/tech-app:jma-3.0'
                 }
 
             }
