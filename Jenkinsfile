@@ -24,10 +24,12 @@ pipeline{
 
             }
         }
-        stage("build image") {
+        stage("build  and push image") {
             steps {
                 script {
                     buildImage 'monirerahmani/tech-app:jma-3.0'
+                    dockerLogin()
+                    dockerPush 'monirerahmani/tech-app:jma-3.0
                 }
 
             }
