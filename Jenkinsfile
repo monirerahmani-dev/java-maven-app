@@ -10,29 +10,24 @@ pipeline{
     tools {
         maven "maven-3.9"
     }
+    environment {
+        IMAGE_NAME = 'monirerahmani/tech-app:jma-4.0'
+    }
 
     stages{
-        stage("init") {
+        stage('build app') {
             steps {
-                script {
-                    gv = load "script.groovy"
-                }
+                echo 'building application jar...'
+                buildJar()
             }
         }
-        stage("build jar") {
+        stage('build  and push image') {
             steps {
                 script {
-                    buildJar()
-                }
-
-            }
-        }
-        stage("build  and push image") {
-            steps {
-                script {
-                    buildImage 'monirerahmani/tech-app:jma-3.0'
+                    echo 'building the docker image...'
+                    buildImage (env.IMAGE_NAME)
                     dockerLogin()
-                    dockerPush 'monirerahmani/tech-app:jma-3.0'
+                    dockerPush (env.IMAGE_NAME)
                 }
 
             }
@@ -40,9 +35,14 @@ pipeline{
         stage("deploy") {
             steps {
                 script {
-                    gv.deployApp()
+                    echo 'deploying docker image to EC2...'
+                    def dockerCmd = "docker run -p 3080:3080 -d ${IMAGE_NAME}"
+                    sshagent(['ec2-server-key']) {
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@13.41.162.83 ${dockerCmd}"
+                    }
                 }
-            }
+            }               
         }
+
     }
 }
